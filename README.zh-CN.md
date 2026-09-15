@@ -2,11 +2,12 @@
 
 [English](README.md) | **中文**
 
-用于开发 DeepSeek Harness（DSH）插件的工具集：一个可以在实时会话里查询的运行时检查器、
-一个用于测试的隔离启动器、无需浏览器的宿主契约测试，以及面向客户端半边（client half）的槽位预览。
+用于开发 [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness)（DSH）插件的工具集：
+一个可以在实时会话里查询的运行时检查器、一个用于测试的隔离启动器、无需浏览器的宿主契约测试，
+以及面向客户端半边（client half）的槽位预览。
 
 **状态：** 四个模块全部实现。547 个单元测试，外加六项真机检查 —— 跑在真实的 cordis 运行时、
-真实的 DSH 启动，以及真实的一次模型轮次上。
+真实的 DSH 启动，以及真实的一次模型轮次上。已在 DSH `0.1.5-rc.2` 上验证。
 
 ---
 
@@ -38,6 +39,10 @@ npm install --save-dev \
 > 克隆后按路径安装则在任何版本上都可用。已在 npm 10.1 + node 22 上验证。
 
 ### 环境要求
+
+**DSH `0.1.5-rc.2`** —— 本 DevKit 开发与验证所针对的版本，四个包都用 `engines.dsh` 声明。
+DevKit 只通过公开接缝接触宿主（`ctx.debugger`、`/debug`、CLI 退出码、JSON 报告），
+所以相近的版本通常可用，但其他版本未经测试。
 
 Node 22 或更高。`dsh-plugin-preview` 可选地使用系统 Edge/Chrome 截图、使用 esbuild 打包；
 两者都在运行时探测，缺失时会明确报告，绝不会自行下载。

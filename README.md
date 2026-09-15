@@ -2,12 +2,13 @@
 
 **English** | [中文](README.zh-CN.md)
 
-Tools for developing DeepSeek Harness (DSH) plugins: a runtime
+Tools for developing [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness) (DSH) plugins: a runtime
 inspector you can query from a live session, an isolated boot for testing, host contract tests
 without a browser, and a slot preview for client halves.
 
 **Status:** all four modules implemented. 547 unit tests, plus six real-machine checks that run
-against a real cordis runtime, a real DSH boot, and a real model turn.
+against a real cordis runtime, a real DSH boot, and a real model turn. Verified against DSH
+`0.1.5-rc.2`.
 
 ---
 
@@ -41,6 +42,11 @@ Adjust the relative path to wherever you cloned it. Each package is exported und
 > everywhere. Verified against npm 10.1 and node 22.
 
 ### Requirements
+
+**DSH `0.1.5-rc.2`** — the release this DevKit is developed and verified against, declared as
+`engines.dsh` by every package. The DevKit reaches the host only through public seams
+(`ctx.debugger`, `/debug`, CLI exit codes, JSON reports), so a nearby release will usually work,
+but anything else is untested.
 
 Node 22 or newer. `dsh-plugin-preview` optionally uses a system Edge/Chrome for screenshots and
 esbuild for bundling; both are probed at runtime and their absence is reported, never downloaded.

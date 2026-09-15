@@ -5,6 +5,7 @@
   "description": "DSH Plugin DevKit: runtime observation kernel, isolated debug boot, host contract tests, slot preview",
   "main": "packages/dsh-debugger/index.mjs",
   "dsh": {
+    "manifestVersion": 1,
     "entry": "packages/dsh-debugger/index.mjs"
   },
   "workspaces": [
@@ -15,6 +16,7 @@
     "test:debugger": "node --test \"packages/dsh-debugger/tests/*.test.mjs\""
   },
   "engines": {
-    "node": ">=22"
+    "node": ">=22",
+    "dsh": "^0.1.5-rc.2"
   }
 }

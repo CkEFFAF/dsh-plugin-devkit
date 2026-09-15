@@ -29,7 +29,8 @@
     "dsh-debugger": "^0.1.0"
   },
   "engines": {
-    "node": ">=22"
+    "node": ">=22",
+    "dsh": "^0.1.5-rc.2"
   },
   "scripts": {
     "test": "node --test tests/*.test.mjs"
