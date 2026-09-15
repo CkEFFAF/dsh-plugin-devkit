@@ -80,6 +80,58 @@ Node 22 或更高。`dsh-plugin-preview` 可选地使用系统 Edge/Chrome 截�
 
 ---
 
+## 它能做什么
+
+- **问一个正在运行的组合现在什么状态。** `/debug health` 给一句结论；
+  `/debug plugins --not-active` 点名一个从未激活的插件，**以及它在等哪个服务**；
+  `/debug services` 显示谁提供了什么。
+- **把一次调用从头追到尾。** `/debug trace <callId>` 返回共享同一 correlation id 的全部记录 ——
+  一次工具调用就是 `pre-execute → execute → result`，带耗时。
+- **看见模型轮次，而不只是工具调用。** 纯文本的一轮也会留下一条 `llm/stream` 记录，
+  含 provider、model、消息计数，并关联到它所属的 session。
+- **在副本上复现故障。** `debug-boot` 从随包模板派生一个一次性 profile，
+  真机检查永远不碰你的日常实例。
+- **不开浏览器就证明插件的宿主契约。** `dsh-plugin-test` 把插件挂到假 Cordis 宿主上，
+  返回稳定 schema 的 JSON 报告。
+- **看看客户端半边。** `dsh-plugin-preview` 把它渲染进假槽位，按官方主题尺寸近似显示，
+  light/dark × narrow/wide 四种变体。
+
+以上全部都能在你**已经打开的那个会话里**查询 —— 不用 attach DevTools，不用开第二个窗口。
+
+---
+
+## 与同类工具的差异
+
+DSH 本身已经自带若干检查面。它们回答的是不同的问题，本 DevKit 的设计目标是**与它们并排**，
+而不是取代它们。
+
+| | 本 DevKit | `dsh-experimental-inspector` | `dsh-tool-cordis` | Plugins 设置页 |
+|---|---|---|---|---|
+| 从哪用 | 聊天会话（`/debug`）与 CLI | Chrome DevTools 经 CDP 连接 | 模型工具调用 | Web 设置页 |
+| 实时组合（fiber 状态、pending/failed 根因） | 有 —— 直接点名在等哪个服务 | Elements 面板里的 Cordis 树 | 有 | 只读的 loader 清单 |
+| 工具 / 命令 / LLM 时间线，按 `callId` 关联 | 有，有界并计数 | Console + Network 面板 | 无 | 无 |
+| 采集负载里的密钥 | **进缓冲前就已脱敏** | 不脱敏（官方文档明示） | 不适用 | 不适用 |
+| 能否改变组合 | 不能 —— 纯旁观 | 不直接改，但 CDP 授予任意求值 | 能 —— 创建并运行临时包 | 不能 |
+| 获取方式 | 公开、MIT、克隆后按路径装 | 私有、实验性、不随发布 | 随 DSH 发布，需自行挂载 | 随 profile 自带 |
+
+**这些差异换来了什么：**
+
+- **它不会弄坏被观察的对象。** waterfall 探针原样返回 `next()` 的引用 —— 返回副本会搞坏整个
+  组合的生成，因此有一个针对真实 `LlmRuntime` 的检查把它钉住。
+- **密钥在入库前脱敏**，而不是显示时才处理 —— 泄漏的 key 根本进不了缓冲。
+- **证据不会悄悄消失。** 缓冲有界、溢出被计数，JSON 报告带 `summary.overflowed` /
+  `recordsDropped`，因此「丢了证据」的一次运行不可能被读成干净的通过。
+- **它测的是契约，不是 mock。** 假宿主镜像 `normalizeDefinition` 与真实的
+  `execute(agent, line, …)` 签名 —— 这正是它抓到「单测全绿、真机上却什么都不做」那类插件的原因。
+- **隔离是硬规则。** 真机检查跑在派生 profile 上；永不激活的插件被报成 `plugin-pending`
+  （退出码 7）并点名它在等的服务，而不是甩一段 loader 堆栈。
+- **边界明说，不暗示。** 不承诺像素级一致，截图只拍不比，任何东西都不经过检查器代理。
+
+**它刻意不做的事：** 源码级单步（那是 `NODE_OPTIONS=--inspect` 的活）、插件市场或安装 UI、
+agent 轨迹工作台；也从不对自己注入 `tools`。
+
+---
+
 ## 工作流
 
 ```sh

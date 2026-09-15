@@ -86,6 +86,64 @@ esbuild for bundling; both are probed at runtime and their absence is reported, 
 
 ---
 
+## What you can do with it
+
+- **Ask a live composition what state it is in.** `/debug health` gives one verdict;
+  `/debug plugins --not-active` names a plugin that never activated *and the service it is
+  waiting for*; `/debug services` shows who provides what.
+- **Follow one call end to end.** `/debug trace <callId>` returns every record sharing a
+  correlation id — `pre-execute → execute → result` for a tool call, with durations.
+- **See model turns, not only tool calls.** A text-only turn still records an `llm/stream` row
+  with provider, model and message counts, correlated to its session.
+- **Reproduce a failure on a copy.** `debug-boot` derives a throwaway profile from the shipped
+  template, so live checks never touch your daily instance.
+- **Prove your plugin's host contract without a browser.** `dsh-plugin-test` mounts it on a fake
+  Cordis host and returns a stable JSON report.
+- **Look at your client half.** `dsh-plugin-preview` renders it in a fake slot at approximate
+  official theme sizes, light/dark × narrow/wide.
+
+All of it is queryable from the session you are already in — no DevTools attach, no second window.
+
+---
+
+## How it compares
+
+DSH already ships inspection surfaces. They answer different questions, and the DevKit is built to
+sit beside them rather than replace them.
+
+| | This DevKit | `dsh-experimental-inspector` | `dsh-tool-cordis` | Plugins settings tab |
+|---|---|---|---|---|
+| Used from | the chat session (`/debug`) and the CLI | Chrome DevTools over CDP | model tool calls | the Web settings UI |
+| Live composition (fiber state, pending/failed cause) | yes — names the awaited service | Cordis tree in the Elements panel | yes | read-only loader inventory |
+| Tool / command / LLM timeline correlated by `callId` | yes, bounded and counted | Console + Network panels | no | no |
+| Secrets in captured payloads | **redacted before they enter the buffer** | not redacted (documented) | n/a | n/a |
+| Can it change the composition? | no — observation only | not directly, but CDP grants arbitrary evaluation | yes — creates and runs temp packages | no |
+| Availability | public, MIT, installed from a clone | private, experimental, excluded from releases | shipped, mounted only if you add it | shipped with the profile |
+
+**What that buys you:**
+
+- **It cannot break what it observes.** Waterfall probes return `next()`'s exact reference — a
+  returned copy would break generation for the whole composition, so a real-`LlmRuntime` check
+  pins it.
+- **Secrets are sanitized before storage**, not on display — a leaked key never reaches the buffer.
+- **Evidence cannot silently vanish.** Buffers are bounded, overflow is counted, and the JSON
+  report carries `summary.overflowed` / `recordsDropped`, so a run that lost evidence cannot read
+  as a clean pass.
+- **It tests the contract, not the mock.** The fake host mirrors `normalizeDefinition` and the
+  real `execute(agent, line, …)` signature — which is how it catches plugins that pass a green
+  suite and still do nothing on a real host.
+- **Isolation is a hard rule.** Live checks run on a derived profile; a plugin that never
+  activates is reported as `plugin-pending` (exit 7) naming the awaited service, not as a loader
+  stack trace.
+- **Scope is stated, not implied.** No pixel-parity promise, screenshots capture but never compare,
+  and nothing is proxied through the inspector.
+
+**What it deliberately does not do:** source-level stepping (that is `NODE_OPTIONS=--inspect`),
+plugin marketplace or install UI, agent-trajectory workbench — and it never injects `tools` into
+itself.
+
+---
+
 ## The workflow
 
 ```sh
