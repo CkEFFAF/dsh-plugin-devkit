@@ -3,6 +3,10 @@
   "private": true,
   "type": "module",
   "description": "DSH Plugin DevKit: runtime observation kernel, isolated debug boot, host contract tests, slot preview",
+  "main": "packages/dsh-debugger/index.mjs",
+  "dsh": {
+    "entry": "packages/dsh-debugger/index.mjs"
+  },
   "workspaces": [
     "packages/*"
   ],
