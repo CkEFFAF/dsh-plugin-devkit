@@ -9,6 +9,9 @@
 **状态：** 四个模块全部实现。547 个单元测试，外加六项真机检查 —— 跑在真实的 cordis 运行时、
 真实的 DSH 启动，以及真实的一次模型轮次上。已在 DSH `0.1.5-rc.2` 上验证。
 
+> **社区项目。** 本 DevKit 由社区维护，**与 DeepSeek AI 无隶属关系**，也不由其背书或提供支持。
+> 「DeepSeek Harness」「DSH」指它所面向的上游平台。
+
 ---
 
 ## 快速开始
@@ -33,6 +36,20 @@ npm install --save-dev \
 
 把相对路径调整成你的克隆位置即可。每个包都以自己的名字导出（`dsh-debugger`、`dsh-plugin-test` 等），
 其中三个带 CLI 的会安装一条命令。
+
+### 把运行时检查器装进 DSH profile
+
+`dsh-debugger` 是运行时插件，通过 DSH CLI 挂进 profile：
+
+```sh
+dsh plugin --profile web add /path/to/dsh-plugin-devkit/packages/dsh-debugger
+```
+
+`dsh plugin` 会在 profile 目录里执行 pnpm，然后对账 `dsh.profile.bundles` ——
+由于该包声明了 `dsh.bundle.patch`，它会自动加入层栈。重启 DSH 后 `/debug health` 即可回答。
+
+> 四个包**未发布到 npm**，所以上面的 spec 是指向克隆目录的路径。
+> 裸包名形式 `dsh plugin --profile web add dsh-debugger` 需要先做一次 npm 发布。
 
 > **为什么不用 `npm install git+https://…`？** npm 直到 10.5 才支持 git 子目录；更早的版本会
 > **静默安装整个仓库根目录**，而不是你指定的那个包 —— 你拿到的是一个没有入口点、也不报错的文件夹。

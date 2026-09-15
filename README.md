@@ -10,6 +10,10 @@ without a browser, and a slot preview for client halves.
 against a real cordis runtime, a real DSH boot, and a real model turn. Verified against DSH
 `0.1.5-rc.2`.
 
+> **Community project.** This DevKit is community-maintained and is **not** affiliated with,
+> endorsed by, or supported by DeepSeek AI. "DeepSeek Harness" and "DSH" name the upstream
+> platform it is built for.
+
 ---
 
 ## Getting started
@@ -35,6 +39,21 @@ npm install --save-dev \
 
 Adjust the relative path to wherever you cloned it. Each package is exported under its own name
 (`dsh-debugger`, `dsh-plugin-test`, …) and the three with a CLI install a command.
+
+### Install the runtime inspector into a DSH profile
+
+`dsh-debugger` is a runtime plugin, so it is mounted in a profile through the DSH CLI:
+
+```sh
+dsh plugin --profile web add /path/to/dsh-plugin-devkit/packages/dsh-debugger
+```
+
+`dsh plugin` runs pnpm inside the profile directory and then reconciles `dsh.profile.bundles`,
+so the package joins the layer stack because it declares `dsh.bundle.patch`. Restart DSH and
+`/debug health` answers.
+
+> The four packages are **not published to npm**, so the spec above is a path to the cloned
+> package. The bare `dsh plugin --profile web add dsh-debugger` form needs an npm release first.
 
 > **Why not `npm install git+https://…`?** npm only gained git-subdirectory support in 10.5, and
 > older versions **silently install the repository root** instead of the package you asked for —
