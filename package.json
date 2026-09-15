@@ -1,0 +1,16 @@
+{
+  "name": "dsh-plugin-devkit",
+  "private": true,
+  "type": "module",
+  "description": "DSH Plugin DevKit: runtime observation kernel, isolated debug boot, host contract tests, slot preview",
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "test": "node --test \"packages/*/tests/*.test.mjs\"",
+    "test:debugger": "node --test \"packages/dsh-debugger/tests/*.test.mjs\""
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}

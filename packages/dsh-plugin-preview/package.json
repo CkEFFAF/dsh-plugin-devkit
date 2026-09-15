@@ -1,0 +1,36 @@
+{
+  "name": "dsh-plugin-preview",
+  "version": "0.1.0",
+  "description": "Slot preview shell for DSH plugin client halves: mount a client factory into a fake slot at approximate official theme sizes",
+  "keywords": [
+    "dsh",
+    "deepseek-harness",
+    "cordis",
+    "plugin",
+    "preview",
+    "client",
+    "ui",
+    "slot"
+  ],
+  "license": "MIT",
+  "type": "module",
+  "main": "index.mjs",
+  "exports": {
+    ".": "./index.mjs",
+    "./tokens": "./src/tokens.mjs",
+    "./shell": "./src/shell.mjs",
+    "./fixture": "./src/fixture.mjs",
+    "./bundle": "./src/bundle.mjs",
+    "./screenshot": "./src/screenshot.mjs",
+    "./package.json": "./package.json"
+  },
+  "bin": {
+    "dsh-plugin-preview": "./bin/preview.mjs"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "test": "node --test tests/*.test.mjs"
+  }
+}

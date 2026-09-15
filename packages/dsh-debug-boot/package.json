@@ -1,0 +1,36 @@
+{
+  "name": "dsh-debug-boot",
+  "version": "0.1.0",
+  "description": "Boot an isolated DSH profile for plugin development: shipped template, generated overlay, fixed debug port",
+  "keywords": [
+    "dsh",
+    "deepseek-harness",
+    "cordis",
+    "plugin",
+    "debug",
+    "boot",
+    "profile"
+  ],
+  "license": "MIT",
+  "type": "module",
+  "main": "./src/index.mjs",
+  "bin": {
+    "debug-boot": "./bin/debug-boot.mjs"
+  },
+  "exports": {
+    ".": "./src/index.mjs",
+    "./plan": "./src/plan.mjs",
+    "./overlay": "./src/overlay.mjs",
+    "./entry": "./src/entry.mjs",
+    "./failures": "./src/failures.mjs",
+    "./preflight": "./src/preflight.mjs",
+    "./args": "./src/args.mjs",
+    "./package.json": "./package.json"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "test": "node --test tests/*.test.mjs"
+  }
+}

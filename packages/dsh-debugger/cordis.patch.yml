@@ -1,0 +1,23 @@
+# Bundle layer for dsh-debugger.
+#
+# This file is what makes the package installable as a profile layer rather than
+# a plain dependency: `dsh plugin --profile <name> add dsh-debugger` runs pnpm in
+# the profile directory and then reconciles `dsh.profile.bundles` against the
+# installed state — a dependency whose manifest declares `dsh.bundle.patch`
+# joins the layer stack automatically (apps/cli/src/plugin.ts:59-91).
+#
+# The entry is a bare package specifier, resolved by the loader from the profile
+# that installed it. It is NOT a relative './index.mjs': a relative `name` is
+# anchored to this file's own directory, which works only for the
+# in-checkout `--patch` path that dsh-debug-boot generates (and which emits
+# absolute paths instead). A bare specifier is the correct form for a real
+# installation, and it is what the shipped bundles use.
+
+- insert:
+    - id: dsh-debugger
+      name: 'dsh-debugger'
+      config:
+        # Announces readiness in the boot log, so a user can tell the kernel
+        # mounted without opening /debug first. Same default as the row
+        # dsh-debug-boot writes, so the two paths behave identically.
+        announce: true

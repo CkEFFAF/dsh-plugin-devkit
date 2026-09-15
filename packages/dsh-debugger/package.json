@@ -1,0 +1,37 @@
+{
+  "name": "dsh-debugger",
+  "version": "0.1.0",
+  "description": "Runtime inspector for DSH plugin development: a unified timeline, the /debug command, and a programmable ctx.debugger",
+  "keywords": [
+    "dsh",
+    "deepseek-harness",
+    "cordis",
+    "plugin",
+    "debugger",
+    "inspector",
+    "observability"
+  ],
+  "license": "MIT",
+  "type": "module",
+  "main": "index.mjs",
+  "exports": {
+    ".": "./index.mjs",
+    "./sanitize": "./src/sanitize.mjs",
+    "./fiber-state": "./src/fiber-state.mjs",
+    "./ring-buffer": "./src/ring-buffer.mjs",
+    "./recorder": "./src/recorder.mjs",
+    "./package.json": "./package.json"
+  },
+  "dsh": {
+    "entry": "index.mjs",
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    }
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "test": "node --test tests/*.test.mjs"
+  }
+}

@@ -1,0 +1,25 @@
+# Files that must never be committed or shipped.
+
+node_modules/
+
+# Local scratch: real-machine runs, isolated DSH_HOMEs and their artifacts.
+.tmp-run/
+.tmp/
+*.tmp
+
+# Test output and generated preview pages.
+*.tgz
+shots/
+preview.html
+preview-inline.html
+
+# Editor / OS noise.
+.vscode/
+.idea/
+*.swp
+.DS_Store
+Thumbs.db
+
+# Logs from a boot that was driven by hand.
+*.log
+npm-debug.log*

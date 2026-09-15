@@ -1,0 +1,37 @@
+{
+  "name": "dsh-plugin-test",
+  "version": "0.1.0",
+  "description": "Host contract tests for DSH plugins: a fake Cordis host, assertion helpers over ctx.debugger, and a JSON report",
+  "keywords": [
+    "dsh",
+    "deepseek-harness",
+    "cordis",
+    "plugin",
+    "test",
+    "contract-test",
+    "fake-host"
+  ],
+  "license": "MIT",
+  "type": "module",
+  "main": "index.mjs",
+  "exports": {
+    ".": "./index.mjs",
+    "./fake-host": "./src/fake-host.mjs",
+    "./assertions": "./src/assertions.mjs",
+    "./report": "./src/report.mjs",
+    "./json": "./src/json.mjs",
+    "./package.json": "./package.json"
+  },
+  "bin": {
+    "dsh-plugin-test": "./bin/plugin-test.mjs"
+  },
+  "dependencies": {
+    "dsh-debugger": "^0.1.0"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "test": "node --test tests/*.test.mjs"
+  }
+}
