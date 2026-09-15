@@ -108,8 +108,10 @@ All of it is queryable from the session you are already in — no DevTools attac
 
 ## How it compares
 
-DSH already ships inspection surfaces. They answer different questions, and the DevKit is built to
-sit beside them rather than replace them.
+DSH ships inspection surfaces of its own, and the community has built more. They answer different
+questions, and the DevKit is built to sit beside them rather than replace them.
+
+### Against what DSH already ships
 
 | | This DevKit | `dsh-experimental-inspector` | `dsh-tool-cordis` | Plugins settings tab |
 |---|---|---|---|---|
@@ -120,8 +122,20 @@ sit beside them rather than replace them.
 | Can it change the composition? | no — observation only | not directly, but CDP grants arbitrary evaluation | yes — creates and runs temp packages | no |
 | Availability | public, MIT, installed from a clone | private, experimental, excluded from releases | shipped, mounted only if you add it | shipped with the profile |
 
+### Against community plugins
+
+Descriptions below are each project's own, quoted from its repository and npm listing.
+
+| Project | What it is | How this DevKit differs |
+|---|---|---|
+| [`dsh-doctor`](https://github.com/astra3294/dsh-doctor) | "Deterministic diagnostics **and recovery** for DeepSeek Harness" — a loopback rescue service in the Web UI plus a CLI (`scan`, `boot`, `recover`, `checkpoint`, `rollback`) | Doctor **repairs**: it resets config to a healthy checkpoint, realigns dependencies and re-verifies the boot. This **observes and reports** — a bounded timeline, pending/failed root cause, tool and LLM correlation — and never writes to your composition. |
+| [`dsh-sseye`](https://github.com/jhuanxx44/dsh-sseye) | "The LLM debug console inside DeepSeek Harness — capture every model call, see everything, replay anything" | Closest overlap: both tap the `llm/stream` waterfall. sseye captures **full LLM payloads** and can replay or mutate a call; this records scalars, redacts secrets before storage, and covers the whole composition, not only model calls. |
+| [`@ddtcorex/dsh-maestro-devkit`](https://www.npmjs.com/package/@ddtcorex/dsh-maestro-devkit) | "General development toolkit for DeepSeek Harness — visual review, HMR, style inspector, Cordis/Govard/Skills dev" — **deprecated on npm**: "Retired: duplicated DSH core, CDP, Supervisor, Govard, and skill capabilities without completing a demonstrated workflow" | The nearest existing thing to a competing DevKit, and no longer maintained. This one keeps a narrower promise: four small tools, and an offline slot preview instead of live HMR and style inspection. |
+
 **What that buys you:**
 
+- **Four tools, one repo.** Observe a live composition, boot an isolated profile, test the host
+  contract, preview the client half — each alternative above covers one of those jobs.
 - **It cannot break what it observes.** Waterfall probes return `next()`'s exact reference — a
   returned copy would break generation for the whole composition, so a real-`LlmRuntime` check
   pins it.
@@ -137,6 +151,16 @@ sit beside them rather than replace them.
   stack trace.
 - **Scope is stated, not implied.** No pixel-parity promise, screenshots capture but never compare,
   and nothing is proxied through the inspector.
+
+**Where the others go further, stated plainly:**
+
+- `dsh-sseye` captures the complete request and response — system prompt, tool schemas, every
+  stream chunk, the wire endpoint — and can replay or mutate a call. This records scalars only.
+- `dsh-doctor` can *act*: roll a broken profile back to its last healthy checkpoint, and re-verify
+  the boot afterwards. Nothing here writes to your setup.
+- `dsh-doctor`, `dsh-sseye` and `dsh-maestro-devkit` install from npm in one line
+  (`dsh plugin --profile web add <name>`). These four packages are not published, so installation
+  is a clone plus a path.
 
 **What it deliberately does not do:** source-level stepping (that is `NODE_OPTIONS=--inspect`),
 plugin marketplace or install UI, agent-trajectory workbench — and it never injects `tools` into

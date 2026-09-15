@@ -102,8 +102,10 @@ Node 22 或更高。`dsh-plugin-preview` 可选地使用系统 Edge/Chrome 截�
 
 ## 与同类工具的差异
 
-DSH 本身已经自带若干检查面。它们回答的是不同的问题，本 DevKit 的设计目标是**与它们并排**，
-而不是取代它们。
+DSH 自带若干检查面，社区也做了不少工具。它们回答的是不同的问题，本 DevKit 的设计目标是
+**与它们并排**，而不是取代它们。
+
+### 对比 DSH 自带的检查面
 
 | | 本 DevKit | `dsh-experimental-inspector` | `dsh-tool-cordis` | Plugins 设置页 |
 |---|---|---|---|---|
@@ -114,8 +116,20 @@ DSH 本身已经自带若干检查面。它们回答的是不同的问题，本 
 | 能否改变组合 | 不能 —— 纯旁观 | 不直接改，但 CDP 授予任意求值 | 能 —— 创建并运行临时包 | 不能 |
 | 获取方式 | 公开、MIT、克隆后按路径装 | 私有、实验性、不随发布 | 随 DSH 发布，需自行挂载 | 随 profile 自带 |
 
+### 对比社区插件
+
+下表的描述都引自各项目自己的仓库与 npm 页面。
+
+| 项目 | 它是什么 | 本 DevKit 的差别 |
+|---|---|---|
+| [`dsh-doctor`](https://github.com/astra3294/dsh-doctor) | 「Deterministic diagnostics **and recovery** for DeepSeek Harness」—— WebUI 里的本机救援服务，外加 CLI（`scan`、`boot`、`recover`、`checkpoint`、`rollback`） | Doctor 会**修**：把配置重置回健康检查点、对齐依赖、再验证启动。本 DevKit **只观察和报告** —— 有界时间线、pending/failed 根因、工具与 LLM 关联 —— 绝不写你的组合。 |
+| [`dsh-sseye`](https://github.com/jhuanxx44/dsh-sseye) | 「DeepSeek Harness 里的 LLM 调试控制台 —— 捕获每一次模型调用、看全内容、重放任何一次」 | 重叠最大：两者都挂 `llm/stream` waterfall。sseye 捕获**完整 LLM 负载**并能重放或改写调用；本 DevKit 只记标量、在入库前脱敏，覆盖的是整个组合而不只是模型调用。 |
+| [`@ddtcorex/dsh-maestro-devkit`](https://www.npmjs.com/package/@ddtcorex/dsh-maestro-devkit) | 「DeepSeek Harness 通用开发工具箱 —— 可视化审查、HMR、样式检查器、Cordis/Govard/Skills 开发」—— **已在 npm 弃用**：「Retired: duplicated DSH core, CDP, Supervisor, Govard, and skill capabilities without completing a demonstrated workflow」 | 现存最接近「同类 DevKit」的东西，而且已停止维护。本项目的承诺更窄：四个小工具，以及离线的槽位预览，而不是实时 HMR 与样式检查。 |
+
 **这些差异换来了什么：**
 
+- **四个工具，一个仓库。** 观察实时组合、隔离启动、测宿主契约、预览客户端半边 ——
+  上面每一个替代品都只覆盖其中一件事。
 - **它不会弄坏被观察的对象。** waterfall 探针原样返回 `next()` 的引用 —— 返回副本会搞坏整个
   组合的生成，因此有一个针对真实 `LlmRuntime` 的检查把它钉住。
 - **密钥在入库前脱敏**，而不是显示时才处理 —— 泄漏的 key 根本进不了缓冲。
@@ -126,6 +140,15 @@ DSH 本身已经自带若干检查面。它们回答的是不同的问题，本 
 - **隔离是硬规则。** 真机检查跑在派生 profile 上；永不激活的插件被报成 `plugin-pending`
   （退出码 7）并点名它在等的服务，而不是甩一段 loader 堆栈。
 - **边界明说，不暗示。** 不承诺像素级一致，截图只拍不比，任何东西都不经过检查器代理。
+
+**别人走得更远的地方，如实说：**
+
+- `dsh-sseye` 捕获完整的请求与响应 —— system prompt、tool schema、每一个流式分片、真实端点 ——
+  并且能重放或改写一次调用。本 DevKit 只记标量。
+- `dsh-doctor` 能**动手**：把坏掉的 profile 回滚到最近一次健康检查点，之后还会再次验证启动。
+  本项目不写你的环境。
+- `dsh-doctor`、`dsh-sseye`、`dsh-maestro-devkit` 都是一行 npm 安装
+  （`dsh plugin --profile web add <名字>`）。本仓库四个包未发布，安装要 clone 后按路径装。
 
 **它刻意不做的事：** 源码级单步（那是 `NODE_OPTIONS=--inspect` 的活）、插件市场或安装 UI、
 agent 轨迹工作台；也从不对自己注入 `tools`。
