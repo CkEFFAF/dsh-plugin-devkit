@@ -37,7 +37,7 @@ import { existsSync, statSync, readFileSync } from 'node:fs'
 
 import { isMainModule } from '../src/main-module.mjs'
 
-import { apply } from 'dsh-debugger'
+import { apply } from '../../dsh-debugger/index.mjs'
 import { createFakeContext, createFakeCommands } from '../src/fake-host.mjs'
 import { runCases, renderReportJson, renderReportSummary } from '../src/report.mjs'
 

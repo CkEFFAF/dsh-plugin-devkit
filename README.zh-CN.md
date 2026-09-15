@@ -16,44 +16,40 @@
 
 ## 快速开始
 
-DevKit 是一个 monorepo，**未发布到 npm**。从克隆出来的仓库里按路径安装你需要的包：
+四个工具都在同一个 npm 包里。把运行时检查器挂进 DSH profile：
 
 ```sh
-git clone https://github.com/CkEFFAF/dsh-plugin-devkit.git dsh-plugin-devkit
-cd dsh-plugin-devkit
-npm install                      # 把四个包链接进 ./node_modules
-```
-
-然后在你**自己的插件**目录里指向需要的包：
-
-```sh
-npm install --save-dev \
-  file:../dsh-plugin-devkit/packages/dsh-debugger \
-  file:../dsh-plugin-devkit/packages/dsh-plugin-test \
-  file:../dsh-plugin-devkit/packages/dsh-debug-boot \
-  file:../dsh-plugin-devkit/packages/dsh-plugin-preview
-```
-
-把相对路径调整成你的克隆位置即可。每个包都以自己的名字导出（`dsh-debugger`、`dsh-plugin-test` 等），
-其中三个带 CLI 的会安装一条命令。
-
-### 把运行时检查器装进 DSH profile
-
-`dsh-debugger` 是运行时插件，通过 DSH CLI 挂进 profile：
-
-```sh
-dsh plugin --profile web add /path/to/dsh-plugin-devkit/packages/dsh-debugger
+dsh plugin --profile web add @effaf/dsh-plugin-devkit
 ```
 
 `dsh plugin` 会在 profile 目录里执行 pnpm，然后对账 `dsh.profile.bundles` ——
 由于该包声明了 `dsh.bundle.patch`，它会自动加入层栈。重启 DSH 后 `/debug health` 即可回答。
 
-> 四个包**未发布到 npm**，所以上面的 spec 是指向克隆目录的路径。
-> 裸包名形式 `dsh plugin --profile web add dsh-debugger` 需要先做一次 npm 发布。
+三条 CLI 也在同一个包里，全局装一次就都在 PATH 上：
+
+```sh
+npm install -g @effaf/dsh-plugin-devkit     # debug-boot、dsh-plugin-test、dsh-plugin-preview
+```
+
+要在自己的插件代码里用某个模块，直接引子路径：
+
+```js
+import { createFakeContext } from '@effaf/dsh-plugin-devkit/fake-host'
+import { noPending } from '@effaf/dsh-plugin-devkit/assertions'
+```
+
+不用 npm、直接从仓库来：
+
+```sh
+git clone https://github.com/CkEFFAF/dsh-plugin-devkit.git
+cd dsh-plugin-devkit
+npm install
+dsh plugin --profile web add "$PWD"
+```
 
 > **为什么不用 `npm install git+https://…`？** npm 直到 10.5 才支持 git 子目录；更早的版本会
 > **静默安装整个仓库根目录**，而不是你指定的那个包 —— 你拿到的是一个没有入口点、也不报错的文件夹。
-> 克隆后按路径安装则在任何版本上都可用。已在 npm 10.1 + node 22 上验证。
+> 安装已发布的包，或克隆后按路径安装，则在任何版本上都可用。已在 npm 10.1 + node 22 上验证。
 
 ### 环境要求
 
@@ -68,7 +64,9 @@ Node 22 或更高。`dsh-plugin-preview` 可选地使用系统 Edge/Chrome 截�
 
 ## 各模块的用途
 
-| 包 | 做什么 | 需要了解 |
+四个模块都在同一个包里：`@effaf/dsh-plugin-devkit`。
+
+| 模块 | 做什么 | 需要了解 |
 |---|---|---|
 | `dsh-debugger` | 观察一个实时组合：有界时间线、`/debug` 命令，以及可编程的 `ctx.debugger` | `ctx.debugger`、`/debug` |
 | `dsh-debug-boot` | 启动隔离的 DSH profile，让真机检查永远不碰你的日常环境 | `debug-boot` CLI |
@@ -114,7 +112,7 @@ DSH 自带若干检查面，社区也做了不少工具。它们回答的是不�
 | 工具 / 命令 / LLM 时间线，按 `callId` 关联 | 有，有界并计数 | Console + Network 面板 | 无 | 无 |
 | 采集负载里的密钥 | **进缓冲前就已脱敏** | 不脱敏（官方文档明示） | 不适用 | 不适用 |
 | 能否改变组合 | 不能 —— 纯旁观 | 不直接改，但 CDP 授予任意求值 | 能 —— 创建并运行临时包 | 不能 |
-| 获取方式 | 公开、MIT、克隆后按路径装 | 私有、实验性、不随发布 | 随 DSH 发布，需自行挂载 | 随 profile 自带 |
+| 获取方式 | 公开、MIT、单个 npm 包（`@effaf/dsh-plugin-devkit`） | 私有、实验性、不随发布 | 随 DSH 发布，需自行挂载 | 随 profile 自带 |
 
 ### 对比社区插件
 
@@ -147,8 +145,9 @@ DSH 自带若干检查面，社区也做了不少工具。它们回答的是不�
   并且能重放或改写一次调用。本 DevKit 只记标量。
 - `dsh-doctor` 能**动手**：把坏掉的 profile 回滚到最近一次健康检查点，之后还会再次验证启动。
   本项目不写你的环境。
-- `dsh-doctor`、`dsh-sseye`、`dsh-maestro-devkit` 都是一行 npm 安装
-  （`dsh plugin --profile web add <名字>`）。本仓库四个包未发布，安装要 clone 后按路径装。
+- `dsh-doctor` 与 `dsh-sseye` 都用裸包名发布，也是更成熟的项目 —— `dsh-doctor` 单月就有数百次
+  npm 下载。本 DevKit 发的是 `@effaf/dsh-plugin-devkit`，名字带 scope 而不是裸名，
+  下载量也从零开始。
 
 **它刻意不做的事：** 源码级单步（那是 `NODE_OPTIONS=--inspect` 的活）、插件市场或安装 UI、
 agent 轨迹工作台；也从不对自己注入 `tools`。
@@ -232,7 +231,7 @@ dsh-plugin-preview --slot tool.view.mine --client ./client.mjs --serve --shot ./
 
 | 路径 | 内容 |
 |---|---|
-| `packages/` | 四个包 |
+| `packages/` | 本包的四个模块 |
 | `skills/plugin-devkit/` | 描述本产品不变量的 agent skill |
 
 ---

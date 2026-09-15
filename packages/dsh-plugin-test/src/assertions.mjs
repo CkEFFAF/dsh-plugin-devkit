@@ -30,7 +30,7 @@
  * one that redacts them would pass while real secrets leak. One source of truth
  * is the only defensible arrangement.
  */
-import { sanitize, redactString, isSecretKey, REDACTED } from 'dsh-debugger/sanitize'
+import { sanitize, redactString, isSecretKey, REDACTED } from '../../dsh-debugger/src/sanitize.mjs'
 import { safeJson } from './json.mjs'
 
 /**

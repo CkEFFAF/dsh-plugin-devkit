@@ -18,47 +18,42 @@ against a real cordis runtime, a real DSH boot, and a real model turn. Verified 
 
 ## Getting started
 
-The DevKit is a monorepo and is **not published to npm**. Install the packages you need from a
-clone by path:
+One npm package carries all four tools. Mount the runtime inspector into a DSH profile:
 
 ```sh
-git clone https://github.com/CkEFFAF/dsh-plugin-devkit.git dsh-plugin-devkit
-cd dsh-plugin-devkit
-npm install                      # links the four packages into ./node_modules
-```
-
-Then, in **your plugin's** directory, point at the packages you want:
-
-```sh
-npm install --save-dev \
-  file:../dsh-plugin-devkit/packages/dsh-debugger \
-  file:../dsh-plugin-devkit/packages/dsh-plugin-test \
-  file:../dsh-plugin-devkit/packages/dsh-debug-boot \
-  file:../dsh-plugin-devkit/packages/dsh-plugin-preview
-```
-
-Adjust the relative path to wherever you cloned it. Each package is exported under its own name
-(`dsh-debugger`, `dsh-plugin-test`, …) and the three with a CLI install a command.
-
-### Install the runtime inspector into a DSH profile
-
-`dsh-debugger` is a runtime plugin, so it is mounted in a profile through the DSH CLI:
-
-```sh
-dsh plugin --profile web add /path/to/dsh-plugin-devkit/packages/dsh-debugger
+dsh plugin --profile web add @effaf/dsh-plugin-devkit
 ```
 
 `dsh plugin` runs pnpm inside the profile directory and then reconciles `dsh.profile.bundles`,
 so the package joins the layer stack because it declares `dsh.bundle.patch`. Restart DSH and
 `/debug health` answers.
 
-> The four packages are **not published to npm**, so the spec above is a path to the cloned
-> package. The bare `dsh plugin --profile web add dsh-debugger` form needs an npm release first.
+The three CLIs ship in the same package — install it globally and they are on your PATH:
+
+```sh
+npm install -g @effaf/dsh-plugin-devkit     # debug-boot, dsh-plugin-test, dsh-plugin-preview
+```
+
+To depend on a module from your own plugin's code, import the subpath:
+
+```js
+import { createFakeContext } from '@effaf/dsh-plugin-devkit/fake-host'
+import { noPending } from '@effaf/dsh-plugin-devkit/assertions'
+```
+
+Working from the repository instead of npm:
+
+```sh
+git clone https://github.com/CkEFFAF/dsh-plugin-devkit.git
+cd dsh-plugin-devkit
+npm install
+dsh plugin --profile web add "$PWD"
+```
 
 > **Why not `npm install git+https://…`?** npm only gained git-subdirectory support in 10.5, and
 > older versions **silently install the repository root** instead of the package you asked for —
-> you get a folder with no entry point and no error. Installing by path after a clone works
-> everywhere. Verified against npm 10.1 and node 22.
+> you get a folder with no entry point and no error. Installing the published package, or a path
+> after a clone, works everywhere. Verified against npm 10.1 and node 22.
 
 ### Requirements
 
@@ -74,7 +69,9 @@ esbuild for bundling; both are probed at runtime and their absence is reported, 
 
 ## What each module is for
 
-| Package | What it does | Learn |
+All four ship in one package, `@effaf/dsh-plugin-devkit`.
+
+| Module | What it does | Learn |
 |---|---|---|
 | `dsh-debugger` | Observe a live composition: a bounded timeline, the `/debug` command, and a programmable `ctx.debugger` | `ctx.debugger`, `/debug` |
 | `dsh-debug-boot` | Boot an isolated DSH profile so live checks never touch your daily setup | the `debug-boot` CLI |
@@ -120,7 +117,7 @@ questions, and the DevKit is built to sit beside them rather than replace them.
 | Tool / command / LLM timeline correlated by `callId` | yes, bounded and counted | Console + Network panels | no | no |
 | Secrets in captured payloads | **redacted before they enter the buffer** | not redacted (documented) | n/a | n/a |
 | Can it change the composition? | no — observation only | not directly, but CDP grants arbitrary evaluation | yes — creates and runs temp packages | no |
-| Availability | public, MIT, installed from a clone | private, experimental, excluded from releases | shipped, mounted only if you add it | shipped with the profile |
+| Availability | public, MIT, one npm package (`@effaf/dsh-plugin-devkit`) | private, experimental, excluded from releases | shipped, mounted only if you add it | shipped with the profile |
 
 ### Against community plugins
 
@@ -158,9 +155,10 @@ Descriptions below are each project's own, quoted from its repository and npm li
   stream chunk, the wire endpoint — and can replay or mutate a call. This records scalars only.
 - `dsh-doctor` can *act*: roll a broken profile back to its last healthy checkpoint, and re-verify
   the boot afterwards. Nothing here writes to your setup.
-- `dsh-doctor`, `dsh-sseye` and `dsh-maestro-devkit` install from npm in one line
-  (`dsh plugin --profile web add <name>`). These four packages are not published, so installation
-  is a clone plus a path.
+- `dsh-doctor` and `dsh-sseye` publish under their own bare names and are the more established
+  projects — `dsh-doctor` alone recorded hundreds of npm downloads a month. This DevKit publishes
+  as `@effaf/dsh-plugin-devkit`, so its name is scoped rather than bare and its download history
+  starts at zero.
 
 **What it deliberately does not do:** source-level stepping (that is `NODE_OPTIONS=--inspect`),
 plugin marketplace or install UI, agent-trajectory workbench — and it never injects `tools` into
@@ -247,7 +245,7 @@ regressions need a screenshot diff against the live shell. `--shot` captures, it
 
 | Path | What |
 |---|---|
-| `packages/` | the four packages |
+| `packages/` | the four modules of the package |
 | `skills/plugin-devkit/` | an agent skill describing the product's invariants |
 
 ---

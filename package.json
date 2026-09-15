@@ -1,12 +1,73 @@
 {
-  "name": "dsh-plugin-devkit",
-  "private": true,
+  "name": "@effaf/dsh-plugin-devkit",
+  "version": "0.1.0",
   "type": "module",
   "description": "DSH Plugin DevKit: runtime observation kernel, isolated debug boot, host contract tests, slot preview",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/CkEFFAF/dsh-plugin-devkit.git"
+  },
+  "keywords": [
+    "dsh",
+    "dsh-plugin",
+    "deepseek-harness",
+    "cordis",
+    "plugin",
+    "developer-tools",
+    "debugging",
+    "inspector"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
   "main": "packages/dsh-debugger/index.mjs",
+  "exports": {
+    ".": "./packages/dsh-debugger/index.mjs",
+    "./debugger": "./packages/dsh-debugger/index.mjs",
+    "./sanitize": "./packages/dsh-debugger/src/sanitize.mjs",
+    "./debug-boot": "./packages/dsh-debug-boot/src/index.mjs",
+    "./plugin-test": "./packages/dsh-plugin-test/index.mjs",
+    "./fake-host": "./packages/dsh-plugin-test/src/fake-host.mjs",
+    "./assertions": "./packages/dsh-plugin-test/src/assertions.mjs",
+    "./preview": "./packages/dsh-plugin-preview/index.mjs",
+    "./tokens": "./packages/dsh-plugin-preview/src/tokens.mjs",
+    "./shell": "./packages/dsh-plugin-preview/src/shell.mjs",
+    "./package.json": "./package.json"
+  },
+  "bin": {
+    "debug-boot": "./packages/dsh-debug-boot/bin/debug-boot.mjs",
+    "dsh-plugin-test": "./packages/dsh-plugin-test/bin/plugin-test.mjs",
+    "dsh-plugin-preview": "./packages/dsh-plugin-preview/bin/preview.mjs"
+  },
+  "files": [
+    "cordis.patch.yml",
+    "README.md",
+    "README.zh-CN.md",
+    "LICENSE",
+    "packages/dsh-debugger/index.mjs",
+    "packages/dsh-debugger/src",
+    "packages/dsh-debugger/cordis.patch.yml",
+    "packages/dsh-debugger/package.json",
+    "packages/dsh-debug-boot/src",
+    "packages/dsh-debug-boot/bin",
+    "packages/dsh-debug-boot/README.md",
+    "packages/dsh-debug-boot/package.json",
+    "packages/dsh-plugin-test/index.mjs",
+    "packages/dsh-plugin-test/src",
+    "packages/dsh-plugin-test/bin",
+    "packages/dsh-plugin-test/package.json",
+    "packages/dsh-plugin-preview/index.mjs",
+    "packages/dsh-plugin-preview/src",
+    "packages/dsh-plugin-preview/bin",
+    "packages/dsh-plugin-preview/package.json"
+  ],
   "dsh": {
     "manifestVersion": 1,
-    "entry": "packages/dsh-debugger/index.mjs"
+    "entry": "packages/dsh-debugger/index.mjs",
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    }
   },
   "workspaces": [
     "packages/*"
