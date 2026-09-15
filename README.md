@@ -1,5 +1,7 @@
 # DSH Plugin DevKit
 
+**English** | [中文](README.zh-CN.md)
+
 Tools for developing DeepSeek Harness (DSH) plugins: a runtime
 inspector you can query from a live session, an isolated boot for testing, host contract tests
 without a browser, and a slot preview for client halves.
